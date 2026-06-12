@@ -42,12 +42,31 @@ AC_API_EXPORT EnumText EnumUtils<Races>::ToString(Races value)
         case RACE_TROLL: return { "RACE_TROLL", "Troll", "" };
         case RACE_BLOODELF: return { "RACE_BLOODELF", "Blood Elf", "" };
         case RACE_DRAENEI: return { "RACE_DRAENEI", "Draenei", "" };
+        case RACE_GOBLIN: return { "RACE_GOBLIN", "Goblin", "" };  
+		case RACE_FEL_ORC: return { "RACE_FEL_ORC", "Void Elf", "" };  
+		case RACE_NAGA: return { "RACE_NAGA", "Vulpera", "" };  
+		case RACE_BROKEN: return { "RACE_BROKEN", "NigthBorne", "" };  
+		case RACE_SKELETON: return { "RACE_SKELETON", "Pandaren Horde", "" };  
+		case RACE_VRYKUL: return { "RACE_VRYKUL", "Worgen", "" };  
+		case RACE_TUSKARR: return { "RACE_TUSKARR", "Pandaren Alliance", "" };  
+		case RACE_FOREST_TROLL: return { "RACE_FOREST_TROLL", "Lightforged Draenei", "" };  
+		case RACE_TAUNKA: return { "RACE_TAUNKA", "Kultiran", "" };  
+		case RACE_NORTHREND_SKELETON: return { "RACE_NORTHREND_SKELETON", "Dark Iron Dwarf", "" };  
+		case RACE_ICE_TROLL: return { "RACE_ICE_TROLL", "Zandalari Troll", "" };  
+		case RACE_CSTM_1: return { "RACE_CSTM_1", "High Elf", "" };  
+		case RACE_CSTM_2: return { "RACE_CSTM_2", "Highmountain Tauren", "" };  
+		case RACE_CSTM_3: return { "RACE_CSTM_3", "Dracthyr Alliance", "" };  
+		case RACE_CSTM_4: return { "RACE_CSTM_4", "Dracthyr Horde", "" };  
+		case RACE_CSTM_5: return { "RACE_CSTM_5", "Mag'har Orc", "" };  
+		case RACE_CSTM_6: return { "RACE_CSTM_6", "27", "" };  
+		case RACE_CSTM_7: return { "RACE_CSTM_7", "28", "" };  
+		
         default: throw std::out_of_range("value");
     }
 }
 
 template <>
-AC_API_EXPORT std::size_t EnumUtils<Races>::Count() { return 10; }
+AC_API_EXPORT std::size_t EnumUtils<Races>::Count() { return 28; }
 
 template <>
 AC_API_EXPORT Races EnumUtils<Races>::FromIndex(std::size_t index)
@@ -64,6 +83,25 @@ AC_API_EXPORT Races EnumUtils<Races>::FromIndex(std::size_t index)
         case 7: return RACE_TROLL;
         case 8: return RACE_BLOODELF;
         case 9: return RACE_DRAENEI;
+        case 10: return RACE_GOBLIN; 
+		case 11: return RACE_FEL_ORC;
+		case 12: return RACE_NAGA;
+		case 13: return RACE_BROKEN;
+		case 14: return  RACE_SKELETON;
+		case 15: return RACE_VRYKUL;
+		case 16: return RACE_TUSKARR;
+		case 17: return RACE_FOREST_TROLL;
+		case 18: return RACE_TAUNKA;
+		case 19: return RACE_NORTHREND_SKELETON;
+		case 20: return RACE_ICE_TROLL;
+		case 21: return RACE_CSTM_1;
+		case 22: return RACE_CSTM_2;
+		case 23: return RACE_CSTM_3;
+		case 24: return RACE_CSTM_4;
+		case 25: return RACE_CSTM_5;
+		case 26: return RACE_CSTM_6;
+		case 27: return RACE_CSTM_7;
+		
         default: throw std::out_of_range("index");
     }
 }

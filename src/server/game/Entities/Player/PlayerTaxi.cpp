@@ -36,9 +36,25 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level
     // race specific initial known nodes: capital and taxi hub masks
     switch (race)
     {
+        case RACE_CSTM_3:
+        case RACE_CSTM_1:
+        case RACE_NORTHREND_SKELETON:
+        case RACE_TAUNKA:
+        case RACE_FOREST_TROLL:
+        case RACE_TUSKARR:
+        case RACE_VRYKUL:
+        case RACE_FEL_ORC:
         case RACE_HUMAN:
             SetTaximaskNode(2);
             break;     // Human
+        case RACE_CSTM_5:
+        case RACE_CSTM_4:
+        case RACE_CSTM_2:
+        case RACE_ICE_TROLL:
+        case RACE_SKELETON:
+        case RACE_BROKEN:
+        case RACE_NAGA:
+        case RACE_GOBLIN:
         case RACE_ORC:
             SetTaximaskNode(23);
             break;     // Orc

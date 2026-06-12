@@ -2346,6 +2346,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                                     target->SetDisplayId(target->getGender() == GENDER_MALE ? 10143 : 10144);
                                     break;
                                 default:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 10143 : 10144);
                                     break;
                             }
                             break;

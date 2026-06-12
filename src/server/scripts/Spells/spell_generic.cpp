@@ -4579,6 +4579,239 @@ class spell_gen_charmed_unit_spell_cooldown : public SpellScript
     }
 };
 
+class spell_gen_worgen_human_visual : public SpellScript
+{
+    PrepareSpellScript(spell_gen_worgen_human_visual);
+
+    void HandleCast()
+    {
+        Unit* caster = GetCaster();
+		uint8 gender = caster->getGender();
+		switch (gender)
+		{ 
+			case GENDER_MALE:
+				caster->SetDisplayId(19723);
+			break;
+			case GENDER_FEMALE:
+				caster->SetDisplayId(19724);
+			break; 
+		}
+    }
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_gen_worgen_human_visual::HandleCast);
+    }
+};
+
+class spell_gen_dractyr_init_jump : public AuraScript
+{
+    PrepareAuraScript(spell_gen_dractyr_init_jump);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			if(caster->HasAura(500001))
+			{
+				caster->RemoveAura(500001);
+			}
+			if(caster->HasAura(500002))
+			{
+				caster->RemoveAura(500002);
+			}
+		}
+    }
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			caster->AddAura(500001, caster);
+			caster->AddAura(376743, caster);
+			if(caster->HasAura(500002))
+			{
+				caster->RemoveAura(500002);
+			}
+		}
+    }
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_dractyr_init_jump::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+		OnEffectRemove += AuraEffectRemoveFn(spell_gen_dractyr_init_jump::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_gen_dractyr_visual : public AuraScript
+{
+    PrepareAuraScript(spell_gen_dractyr_visual);
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			if(caster->HasAura(500001))
+			{
+				caster->RemoveAura(500001);
+			}
+			if(caster->HasAura(376743))
+			{
+				caster->RemoveAura(376743);
+			}
+		}
+    }
+    void Register() override
+    {
+		OnEffectRemove += AuraEffectRemoveFn(spell_gen_dractyr_visual::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_gen_dractyr_falling : public AuraScript
+{
+    PrepareAuraScript(spell_gen_dractyr_falling);
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			caster->AddAura(500002, caster);
+		}
+    }
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			caster->RemoveAura(500001);
+		}
+    }
+    void Register() override
+    {
+		OnEffectRemove += AuraEffectRemoveFn(spell_gen_dractyr_falling::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_dractyr_falling::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL); 
+    }
+};
+
+class spell_gen_dractyr_stomp : public AuraScript
+{
+    PrepareAuraScript(spell_gen_dractyr_stomp);
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			if(caster->HasAura(376743))
+			{
+				caster->RemoveAura(376743);
+				caster->RemoveAura(500001);
+				caster->RemoveAura(500002);
+				caster->CastSpell(caster, 500004, true);
+				caster->AddAura(500005, caster);
+			} 
+		}
+    }
+    void Register() override
+    {
+		OnEffectRemove += AuraEffectRemoveFn(spell_gen_dractyr_stomp::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_gen_dractyr_dash : public AuraScript
+{
+    PrepareAuraScript(spell_gen_dractyr_dash);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			caster->AddAura(500003, caster);
+		}
+    } 
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_dractyr_dash::OnApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED, AURA_EFFECT_HANDLE_REAL); 
+    }
+};
+
+class spell_gen_dractyr_wings : public AuraScript
+{
+    PrepareAuraScript(spell_gen_dractyr_wings);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+		{
+			if(caster->HasAura(360022))
+			{
+				if(caster->HasAura(500001))
+				{
+					caster->RemoveAura(500001);
+				}
+			}
+			else
+			{
+				caster->AddAura(360022, caster);
+			}
+		}
+    } 
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_dractyr_wings::OnApply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL); 
+    }
+};
+ 
+class spell_gen_worgen_worgen_visual : public AuraScript
+{
+    PrepareAuraScript(spell_gen_worgen_worgen_visual);
+ //   PrepareSpellScript(spell_gen_worgen_worgen_visual);
+
+	void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+		uint8 gender = caster->getGender();
+		switch (gender)
+		{ 
+			case GENDER_MALE:
+				caster->SetDisplayId(2243);
+			break;
+			case GENDER_FEMALE:
+				caster->SetDisplayId(2231);
+			break; 
+		}
+    }
+    void Register() override
+    {
+          OnEffectApply += AuraEffectApplyFn(spell_gen_worgen_worgen_visual::HandleApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_gen_worgen_running_visual : public SpellScript
+{
+    PrepareSpellScript(spell_gen_worgen_running_visual);
+
+    void HandleCast()
+    {
+        Unit* caster = GetCaster();
+		uint8 gender = caster->getGender();
+		
+		if(caster->HasAura(68996))
+		{
+			caster->RemoveAura(68996);
+		}
+		
+		switch (gender)
+		{
+			case GENDER_MALE:
+				caster->AddAura(87841, caster);
+			break;
+			case GENDER_FEMALE:
+				caster->AddAura(87842, caster);
+			break; 
+		}
+    }
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_gen_worgen_running_visual::HandleCast);
+    }
+};
+
 // 7102 Contagion of Rot
 class spell_contagion_of_rot : public AuraScript
 {
@@ -6237,6 +6470,15 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_eject_all_passengers);
     RegisterSpellScript(spell_gen_eject_passenger);
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
+    RegisterSpellScript(spell_gen_worgen_human_visual);
+    RegisterSpellScript(spell_gen_dractyr_visual);
+    RegisterSpellScript(spell_gen_dractyr_init_jump);
+    RegisterSpellScript(spell_gen_dractyr_wings);
+    RegisterSpellScript(spell_gen_dractyr_stomp);
+    RegisterSpellScript(spell_gen_dractyr_dash);
+    RegisterSpellScript(spell_gen_dractyr_falling);
+    RegisterSpellScript(spell_gen_worgen_worgen_visual);
+    RegisterSpellScript(spell_gen_worgen_running_visual);
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);

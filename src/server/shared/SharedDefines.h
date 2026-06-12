@@ -67,28 +67,35 @@ enum Gender
 // EnumUtils: DESCRIBE THIS
 enum Races
 {
-    RACE_NONE               = 0,  // SKIP
-    RACE_HUMAN              = 1,  // TITLE Human
-    RACE_ORC                = 2,  // TITLE Orc
-    RACE_DWARF              = 3,  // TITLE Dwarf
-    RACE_NIGHTELF           = 4,  // TITLE Night Elf
-    RACE_UNDEAD_PLAYER      = 5,  // TITLE Undead
-    RACE_TAUREN             = 6,  // TITLE Tauren
-    RACE_GNOME              = 7,  // TITLE Gnome
-    RACE_TROLL              = 8,  // TITLE Troll
-    //RACE_GOBLIN             = 9,
-    RACE_BLOODELF           = 10, // TITLE Blood Elf
-    RACE_DRAENEI            = 11 //, TITLE Draenei
-    //RACE_FEL_ORC        = 12,
-    //RACE_NAGA           = 13,
-    //RACE_BROKEN         = 14,
-    //RACE_SKELETON       = 15,
-    //RACE_VRYKUL         = 16,
-    //RACE_TUSKARR        = 17,
-    //RACE_FOREST_TROLL   = 18,
-    //RACE_TAUNKA         = 19,
-    //RACE_NORTHREND_SKELETON = 20,
-    //RACE_ICE_TROLL      = 21
+    RACE_NONE               = 0,  //  SKIP
+    RACE_HUMAN              = 1,  //  TITLE Human
+    RACE_ORC                = 2,  //  TITLE Orc
+    RACE_DWARF              = 3,  //  TITLE Dwarf
+    RACE_NIGHTELF           = 4,  //  TITLE Night Elf
+    RACE_UNDEAD_PLAYER      = 5,  //  TITLE Undead
+    RACE_TAUREN             = 6,  //  TITLE Tauren
+    RACE_GNOME              = 7,  //  TITLE Gnome
+    RACE_TROLL              = 8,  //  TITLE Troll
+    RACE_GOBLIN             = 9, //  Goblin
+    RACE_BLOODELF           = 10, //  TITLE Blood Elf
+    RACE_DRAENEI            = 11, //  TITLE Draenei
+    RACE_FEL_ORC            = 12, //  Void Elf
+    RACE_NAGA               = 13, //  Vulpera
+    RACE_BROKEN             = 14, //  NigthBorne
+    RACE_SKELETON           = 15, //  Pandaren Horde
+    RACE_VRYKUL             = 16, //  Worgen
+    RACE_TUSKARR            = 17, //  Pandaren Alliance
+    RACE_FOREST_TROLL       = 18, //  Lightforged Draenei
+    RACE_TAUNKA             = 19, //  Kultiran
+    RACE_NORTHREND_SKELETON = 20, //  Dark Iron Dwarf
+    RACE_ICE_TROLL          = 21, //  Zandalari Troll
+    RACE_CSTM_1          	= 22, //  High Elf
+    RACE_CSTM_2          	= 23, //  Highmountain Tauren
+    RACE_CSTM_3         	= 24, //  Dracthyr Alliance
+    RACE_CSTM_4         	= 25, //  Dracthyr Horde
+    RACE_CSTM_5         	= 26, //  Mag'har Orc
+    RACE_CSTM_6         	= 27,
+    RACE_CSTM_7         	= 28
 };
 
 // DisplayRace values from CreatureDisplayInfoExtra.dbc

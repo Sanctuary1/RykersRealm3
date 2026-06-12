@@ -15477,6 +15477,605 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId)
 
     if (IsPlayer())
     {
+		
+        switch (form)
+        {
+			
+            case FORM_TEST:
+				if (getRace() == RACE_CSTM_3)
+                {  
+                    uint8 hairColor = GetByteValue(PLAYER_BYTES, 3);
+                    switch (hairColor)
+                    {
+                        case 0:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32783;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32784;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32785;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32786;
+                            }
+                        case 1:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32787;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32788;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32789;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32790;
+                            }
+                        case 2:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32791;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32792;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32793;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32794;
+                            }
+                        case 3:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32795;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32796;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32797;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32798;
+                            }
+                        case 4:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32799;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32800;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32801;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32802;
+                            }
+                        case 5:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32803;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32804;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32805;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32806;
+                            }
+                        case 6:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32807;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32808;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32809;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32810;
+                            }
+                        case 7:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32811;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32812;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32813;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32814;
+                            }
+                        case 8:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32815;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32816;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32817;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32818;
+                            }
+                        case 9:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32819;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32820;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32821;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32822;
+                            }
+                        case 10:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32823;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32824;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32825;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32826;
+                            }
+                        case 11:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32827;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32828;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32829;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32830;
+                            }
+                        case 12:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32831;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32832;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32833;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32834;
+                            }
+                        case 13:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32835;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32836;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32837;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32838;
+                            }
+                        case 14:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32839;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32840;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32841;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32842;
+                            }
+                        default:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32843;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32844;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32845;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32846;
+                            }
+                    }
+				}
+			    if (getRace() == RACE_CSTM_4)
+                {  
+                    uint8 hairColor = GetByteValue(PLAYER_BYTES, 3);
+                    switch (hairColor)
+                    {
+                        case 0:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32783;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32784;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32785;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32786;
+                            }
+                        case 1:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32787;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32788;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32789;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32790;
+                            }
+                        case 2:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32791;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32792;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32793;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32794;
+                            }
+                        case 3:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32795;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32796;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32797;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32798;
+                            }
+                        case 4:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32799;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32800;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32801;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32802;
+                            }
+                        case 5:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32803;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32804;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32805;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32806;
+                            }
+                        case 6:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32807;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32808;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32809;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32810;
+                            }
+                        case 7:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32811;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32812;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32813;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32814;
+                            }
+                        case 8:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32815;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32816;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32817;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32818;
+                            }
+                        case 9:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32819;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32820;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32821;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32822;
+                            }
+                        case 10:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32823;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32824;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32825;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32826;
+                            }
+                        case 11:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32827;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32828;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32829;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32830;
+                            }
+                        case 12:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32831;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32832;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32833;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32834;
+                            }
+                        case 13:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32835;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32836;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32837;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32838;
+                            }
+                        case 14:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32839;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32840;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32841;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32842;
+                            }
+                        default:
+                            switch (getClass())
+                            {
+                                case CLASS_PALADIN:
+									return 32843;
+                                case CLASS_ROGUE:
+                                case CLASS_HUNTER:
+									return 32844;
+                                case CLASS_WARRIOR:
+                                case CLASS_DEATH_KNIGHT:
+									return 32845;
+                                case CLASS_DRUID:
+                                case CLASS_PRIEST:
+                                case CLASS_SHAMAN:
+                                case CLASS_MAGE:
+                                case CLASS_WARLOCK:
+									return 32846;
+                            }
+                    }
+				}
+            
+            default:
+                break;
+		}
         if (uint32 ModelId = sObjectMgr->GetModelForShapeshift(form, ToPlayer()))
             return ModelId;
     }
