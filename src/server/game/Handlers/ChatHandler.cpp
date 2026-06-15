@@ -558,27 +558,33 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
             break;
         case CHAT_MSG_CHANNEL:
+        {
+            if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHAT_CHANNEL_REQ))
             {
-                if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHAT_CHANNEL_REQ))
+                if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                 {
-                    if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
-                    {
-                        ChatHandler(this).SendNotification(LANG_CHANNEL_REQ, sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
-                        return;
-                    }
-                }
-
-                if (ChannelMgr* cMgr = ChannelMgr::forTeam(sender->GetTeamId()))
-                {
-                    if (Channel* chn = cMgr->GetChannel(channel, sender))
-                    {
-                        if (!sScriptMgr->OnPlayerCanUseChat(sender, type, lang, msg, chn))
-                            return;
-
-                        chn->Say(sender->GetGUID(), msg.c_str(), lang);
-                    }
+                    ChatHandler(this).SendNotification(LANG_CHANNEL_REQ, sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
+                    return;
                 }
             }
+
+            LOG_ERROR("chat",
+                "CHAT_MSG_CHANNEL: Player='{}' Channel='{}' Msg='{}'",
+                sender->GetName(),
+                channel,
+                msg);
+
+            if (ChannelMgr* cMgr = ChannelMgr::forTeam(sender->GetTeamId()))
+            {
+                if (Channel* chn = cMgr->GetChannel(channel, sender))
+                {
+                    if (!sScriptMgr->OnPlayerCanUseChat(sender, type, lang, msg, chn))
+                        return;
+
+                    chn->Say(sender->GetGUID(), msg.c_str(), lang);
+                }
+            }
+        }
             break;
         case CHAT_MSG_AFK:
             {

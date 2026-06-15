@@ -329,9 +329,19 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
                 data << senderName;
             }
 
+
             if (chatType == CHAT_MSG_CHANNEL)
             {
-                ASSERT(channelName.length() > 0);
+                if (channelName.empty())
+                {
+                    LOG_ERROR("chat",
+                        "BuildChatPacket: EMPTY CHANNEL NAME | SenderGUID={} | Message='{}'",
+                        senderGUID.ToString(),
+                        std::string(message));
+
+                    return receiverGUIDPos;
+                }
+
                 data << channelName;
             }
 
