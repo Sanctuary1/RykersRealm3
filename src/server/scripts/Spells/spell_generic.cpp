@@ -34,6 +34,12 @@
 #include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include "DBCStores.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "WorgenLooks.h"
+#include <algorithm>
 #include <array>
 #include <cmath>
 /*
@@ -4668,27 +4674,284 @@ class spell_gen_charmed_unit_spell_cooldown : public SpellScript
     }
 };
 
-class spell_gen_worgen_human_visual : public SpellScript
+// Ryker's Realm (2026-10-12): Worgen racials, retail's line. Data: tools/customization/worgen-forms.js (client) and
+// D:\rr-customization\sql\worgen-forms.sql (server). The Worgen race (16) is the worgen; the human form is a state aura.
+enum WorgenRacials
 {
-    PrepareSpellScript(spell_gen_worgen_human_visual);
+    SPELL_WORGEN_TWO_FORMS       = 68996,
+    SPELL_WORGEN_HUMAN_FORM      = 69001,
+    SPELL_WORGEN_DARKFLIGHT      = 68992,
+    SPELL_WORGEN_RUNNING_WILD    = 87840,
+    SPELL_WORGEN_ALTERED_FORM    = 94293,
+    SPELL_WORGEN_CALM_THE_WOLF   = 406087,
+    WORGEN_RUNNING_WILD_MALE     = 38042,   // the Worgen bodies' all-fours copies (retail MountSelf animations)
+    WORGEN_RUNNING_WILD_FEMALE   = 38043,
+};
 
-    void HandleCast()
+namespace WorgenForms
+{
+    // the race's own display for this character (the one InitDisplayIds would set)
+    uint32 NativeDisplay(Player* player, uint8 race)
     {
-        Unit* caster = GetCaster();
-		uint8 gender = caster->getGender();
-		switch (gender)
-		{ 
-			case GENDER_MALE:
-				caster->SetDisplayId(19723);
-			break;
-			case GENDER_FEMALE:
-				caster->SetDisplayId(19724);
-			break; 
-		}
+        PlayerInfo const* info = sObjectMgr->GetPlayerInfo(race, player->getClass());
+        if (!info)
+            info = sObjectMgr->GetPlayerInfo(race, CLASS_WARRIOR);
+        if (!info)
+            return 0;
+        return player->getGender() == GENDER_FEMALE ? info->displayId_f : info->displayId_m;
     }
+
+    void ShowNative(Player* player, uint32 display)
+    {
+        if (!display)
+            return;
+        player->SetNativeDisplayId(display);
+        player->RestoreDisplayId();      // a shapeshift or transform keeps showing until it ends
+    }
+
+    // the player-selectable choices of one CharSections kind (no death-knight-only rows), sorted
+    std::vector<uint8> Choices(uint8 race, uint8 gender, CharSectionType kind, bool byColor, int32 other)
+    {
+        std::vector<uint8> out;
+        for (bool strict : { true, false })
+        {
+            for (CharSectionsEntry const* e : sCharSectionsStore)
+            {
+                if (e->Race != race || e->Gender != gender || e->GenType != kind)
+                    continue;
+                if (strict && (!(e->Flags & SECTION_FLAG_PLAYER) || (e->Flags & SECTION_FLAG_DEATH_KNIGHT)))
+                    continue;
+                if (other >= 0 && int32(byColor ? e->Type : e->Color) != other)
+                    continue;
+                uint8 v = uint8(byColor ? e->Color : e->Type);
+                if (std::find(out.begin(), out.end(), v) == out.end())
+                    out.push_back(v);
+            }
+            if (!out.empty())
+                break;
+        }
+        std::sort(out.begin(), out.end());
+        return out;
+    }
+
+    uint8 Pick(std::vector<uint8> const& list, uint32 n, uint8 fallback)
+    {
+        return list.empty() ? fallback : list[n % list.size()];
+    }
+
+    // The human the worgen's own choices map onto: same choice numbers where the human has them, wrapped where not,
+    // hair colour from fur colour and face so worgen don't all share one. Always a combination the human tables have.
+    std::array<uint8, 5> HumanLooks(std::array<uint8, 5> const& own, uint8 gender)
+    {
+        uint8 const skin = Pick(Choices(RACE_HUMAN, gender, SECTION_TYPE_SKIN, true, 0), own[0], 0);
+        uint8 const face = Pick(Choices(RACE_HUMAN, gender, SECTION_TYPE_FACE, false, skin), own[1], 0);
+        uint8 const hairColor = Pick(Choices(RACE_HUMAN, gender, SECTION_TYPE_HAIR, true, 0), own[0] * 3u + own[1], 0);
+        uint8 const hairStyle = Pick(Choices(RACE_HUMAN, gender, SECTION_TYPE_HAIR, false, hairColor), own[2], 0);
+        uint8 const facial = Pick(Choices(RACE_HUMAN, gender, SECTION_TYPE_FACIAL_HAIR, false, hairColor), own[4], 0);
+        return { skin, face, hairStyle, hairColor, facial };
+    }
+
+    void SetLooks(Player* player, std::array<uint8, 5> const& looks)
+    {
+        player->SetByteValue(PLAYER_BYTES, 0, looks[0]);
+        player->SetByteValue(PLAYER_BYTES, 1, looks[1]);
+        player->SetByteValue(PLAYER_BYTES, 2, looks[2]);
+        player->SetByteValue(PLAYER_BYTES, 3, looks[3]);
+        player->SetByteValue(PLAYER_BYTES_2, 0, looks[4]);
+    }
+}
+
+// 68996 Two Forms: worgen <-> human. Becoming human is not possible in combat or in a shapeshift; becoming a worgen always is.
+class spell_worgen_two_forms : public SpellScript
+{
+    PrepareSpellScript(spell_worgen_two_forms);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WORGEN_HUMAN_FORM });
+    }
+
+    SpellCastResult CheckCast()
+    {
+        Player* player = GetCaster()->ToPlayer();
+        if (!player)
+            return SPELL_FAILED_BAD_TARGETS;
+        if (player->HasAura(SPELL_WORGEN_HUMAN_FORM))
+            return SPELL_CAST_OK;
+        if (player->IsInCombat())
+            return SPELL_FAILED_AFFECTING_COMBAT;
+        if (player->GetShapeshiftForm() != FORM_NONE)
+            return SPELL_FAILED_NOT_SHAPESHIFT;
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        if (!player)
+            return;
+        if (player->HasAura(SPELL_WORGEN_HUMAN_FORM))
+            player->RemoveAurasDueToSpell(SPELL_WORGEN_HUMAN_FORM);
+        else
+            player->CastSpell(player, SPELL_WORGEN_HUMAN_FORM, true);
+    }
+
     void Register() override
     {
-        OnCast += SpellCastFn(spell_gen_worgen_human_visual::HandleCast);
+        OnCheckCast += SpellCheckCastFn(spell_worgen_two_forms::CheckCast);
+        OnEffectHit += SpellEffectFn(spell_worgen_two_forms::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 69001 Human Form (hidden state): every client sees the character as a human — race byte, human body, the worgen's
+// own choices mapped onto the human's. The character keeps its race on the server (getRace() is the real one) and the
+// worgen looks are what gets saved (WorgenLooks.h).
+class spell_worgen_human_form : public AuraScript
+{
+    PrepareAuraScript(spell_worgen_human_form);
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+        player->RemoveAurasDueToSpell(SPELL_WORGEN_RUNNING_WILD);
+        if (!WorgenLooks::Get(player->GetGUID().GetCounter()))
+        {
+            std::array<uint8, 5> const own = { player->GetByteValue(PLAYER_BYTES, 0), player->GetByteValue(PLAYER_BYTES, 1),
+                player->GetByteValue(PLAYER_BYTES, 2), player->GetByteValue(PLAYER_BYTES, 3), player->GetByteValue(PLAYER_BYTES_2, 0) };
+            WorgenLooks::Save(player->GetGUID().GetCounter(), own);
+            WorgenForms::SetLooks(player, WorgenForms::HumanLooks(own, player->getGender()));
+        }
+        player->SetByteValue(UNIT_FIELD_BYTES_0, 0, RACE_HUMAN);
+        WorgenForms::ShowNative(player, WorgenForms::NativeDisplay(player, RACE_HUMAN));
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+        if (std::optional<WorgenLooks::Looks> const own = WorgenLooks::Get(player->GetGUID().GetCounter()))
+        {
+            WorgenForms::SetLooks(player, *own);
+            WorgenLooks::Clear(player->GetGUID().GetCounter());
+        }
+        player->SetByteValue(UNIT_FIELD_BYTES_0, 0, player->getRace(true));
+        WorgenForms::ShowNative(player, WorgenForms::NativeDisplay(player, player->getRace(true)));
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_worgen_human_form::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_worgen_human_form::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 406087 Calm the Wolf: a toggle. Casting it while it is on turns it off.
+class spell_worgen_calm_the_wolf : public SpellScript
+{
+    PrepareSpellScript(spell_worgen_calm_the_wolf);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (caster->HasAura(SPELL_WORGEN_CALM_THE_WOLF))
+        {
+            caster->RemoveAurasDueToSpell(SPELL_WORGEN_CALM_THE_WOLF);
+            return SPELL_FAILED_DONT_REPORT;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_worgen_calm_the_wolf::CheckCast);
+    }
+};
+
+// 68992 Darkflight: the true form — ends the human form.
+class spell_worgen_darkflight : public SpellScript
+{
+    PrepareSpellScript(spell_worgen_darkflight);
+
+    void HandleAfterCast()
+    {
+        GetCaster()->RemoveAurasDueToSpell(SPELL_WORGEN_HUMAN_FORM);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_worgen_darkflight::HandleAfterCast);
+    }
+};
+
+// 87840 Running Wild: on all fours (the body's all-fours copy), as fast as the character's best ground mount.
+class spell_worgen_running_wild : public SpellScript
+{
+    PrepareSpellScript(spell_worgen_running_wild);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (caster->IsMounted())
+            return SPELL_FAILED_NOT_MOUNTED;
+        if (caster->GetShapeshiftForm() != FORM_NONE)
+            return SPELL_FAILED_NOT_SHAPESHIFT;
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_worgen_running_wild::CheckCast);
+    }
+};
+
+class spell_worgen_running_wild_aura : public AuraScript
+{
+    PrepareAuraScript(spell_worgen_running_wild_aura);
+
+    void CalcSpeed(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Player* player = GetUnitOwner()->ToPlayer())
+            amount = player->GetSkillValue(SKILL_RIDING) >= 150 ? 100 : 60;
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+        player->RemoveAurasDueToSpell(SPELL_WORGEN_HUMAN_FORM);
+        WorgenForms::ShowNative(player, player->getGender() == GENDER_FEMALE ? WORGEN_RUNNING_WILD_FEMALE : WORGEN_RUNNING_WILD_MALE);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetTarget()->ToPlayer();
+        if (!player || player->HasAura(SPELL_WORGEN_HUMAN_FORM))
+            return;
+        WorgenForms::ShowNative(player, WorgenForms::NativeDisplay(player, player->getRace(true)));
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_worgen_running_wild_aura::CalcSpeed, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED);
+        AfterEffectApply += AuraEffectApplyFn(spell_worgen_running_wild_aura::HandleApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_worgen_running_wild_aura::HandleRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 94293 Altered Form: entering combat ends the human form, unless the wolf is calmed.
+class worgen_altered_form : public PlayerScript
+{
+public:
+    worgen_altered_form() : PlayerScript("worgen_altered_form", { PLAYERHOOK_ON_PLAYER_ENTER_COMBAT }) { }
+
+    void OnPlayerEnterCombat(Player* player, Unit* /*enemy*/) override
+    {
+        if (player->HasAura(SPELL_WORGEN_HUMAN_FORM) && player->HasSpell(SPELL_WORGEN_ALTERED_FORM) && !player->HasAura(SPELL_WORGEN_CALM_THE_WOLF))
+            player->RemoveAurasDueToSpell(SPELL_WORGEN_HUMAN_FORM);
     }
 };
 
@@ -4846,61 +5109,6 @@ class spell_gen_dractyr_wings : public AuraScript
     }
 };
  
-class spell_gen_worgen_worgen_visual : public AuraScript
-{
-    PrepareAuraScript(spell_gen_worgen_worgen_visual);
- //   PrepareSpellScript(spell_gen_worgen_worgen_visual);
-
-	void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* caster = GetCaster();
-		uint8 gender = caster->getGender();
-		switch (gender)
-		{ 
-			case GENDER_MALE:
-				caster->SetDisplayId(2243);
-			break;
-			case GENDER_FEMALE:
-				caster->SetDisplayId(2231);
-			break; 
-		}
-    }
-    void Register() override
-    {
-          OnEffectApply += AuraEffectApplyFn(spell_gen_worgen_worgen_visual::HandleApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
-class spell_gen_worgen_running_visual : public SpellScript
-{
-    PrepareSpellScript(spell_gen_worgen_running_visual);
-
-    void HandleCast()
-    {
-        Unit* caster = GetCaster();
-		uint8 gender = caster->getGender();
-		
-		if(caster->HasAura(68996))
-		{
-			caster->RemoveAura(68996);
-		}
-		
-		switch (gender)
-		{
-			case GENDER_MALE:
-				caster->AddAura(87841, caster);
-			break;
-			case GENDER_FEMALE:
-				caster->AddAura(87842, caster);
-			break; 
-		}
-    }
-    void Register() override
-    {
-        OnCast += SpellCastFn(spell_gen_worgen_running_visual::HandleCast);
-    }
-};
-
 // 7102 Contagion of Rot
 class spell_contagion_of_rot : public AuraScript
 {
@@ -6577,15 +6785,18 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_eject_passenger);
     RegisterSpellScript(spell_gen_ethereal_pet_aura);
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
-    RegisterSpellScript(spell_gen_worgen_human_visual);
+    RegisterSpellScript(spell_worgen_two_forms);
+    RegisterSpellScript(spell_worgen_human_form);
+    RegisterSpellScript(spell_worgen_calm_the_wolf);
+    RegisterSpellScript(spell_worgen_darkflight);
+    RegisterSpellAndAuraScriptPair(spell_worgen_running_wild, spell_worgen_running_wild_aura);
+    new worgen_altered_form();
     RegisterSpellScript(spell_gen_dractyr_visual);
     RegisterSpellScript(spell_gen_dractyr_init_jump);
     RegisterSpellScript(spell_gen_dractyr_wings);
     RegisterSpellScript(spell_gen_dractyr_stomp);
     RegisterSpellScript(spell_gen_dractyr_dash);
     RegisterSpellScript(spell_gen_dractyr_falling);
-    RegisterSpellScript(spell_gen_worgen_worgen_visual);
-    RegisterSpellScript(spell_gen_worgen_running_visual);
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
     RegisterSpellScript(spell_gen_arcane_charge);

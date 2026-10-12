@@ -95,6 +95,8 @@
 #include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include <cmath>
+#include <mutex>
+#include <unordered_map>
 #include <queue>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
@@ -102,6 +104,24 @@
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
+#include "WorgenLooks.h"
+
+namespace WorgenLooks
+{
+    namespace
+    {
+        std::mutex lock;
+        std::unordered_map<uint32, Looks> saved;
+    }
+    void Save(uint32 guidLow, Looks const& looks) { std::lock_guard<std::mutex> g(lock); saved[guidLow] = looks; }
+    void Clear(uint32 guidLow) { std::lock_guard<std::mutex> g(lock); saved.erase(guidLow); }
+    std::optional<Looks> Get(uint32 guidLow)
+    {
+        std::lock_guard<std::mutex> g(lock);
+        auto it = saved.find(guidLow);
+        return it == saved.end() ? std::nullopt : std::optional<Looks>(it->second);
+    }
+}
 
 enum CharacterFlags
 {
@@ -15117,11 +15137,13 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetLevel());
         stmt->SetData(index++, GetUInt32Value(PLAYER_XP));
         stmt->SetData(index++, GetMoney());
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 0));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 1));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 2));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 3));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 0));
+        // the character's own looks, not a form's (Worgen human form, see SetSavedAppearance)
+        std::optional<WorgenLooks::Looks> const own = WorgenLooks::Get(GetGUID().GetCounter());
+        stmt->SetData(index++, own ? (*own)[0] : GetByteValue(PLAYER_BYTES, 0));
+        stmt->SetData(index++, own ? (*own)[1] : GetByteValue(PLAYER_BYTES, 1));
+        stmt->SetData(index++, own ? (*own)[2] : GetByteValue(PLAYER_BYTES, 2));
+        stmt->SetData(index++, own ? (*own)[3] : GetByteValue(PLAYER_BYTES, 3));
+        stmt->SetData(index++, own ? (*own)[4] : GetByteValue(PLAYER_BYTES_2, 0));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 2));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 3));
         stmt->SetData(index++, (uint32)GetPlayerFlags());
@@ -15235,11 +15257,13 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetLevel());
         stmt->SetData(index++, GetUInt32Value(PLAYER_XP));
         stmt->SetData(index++, GetMoney());
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 0));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 1));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 2));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES, 3));
-        stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 0));
+        // the character's own looks, not a form's (Worgen human form, see SetSavedAppearance)
+        std::optional<WorgenLooks::Looks> const own = WorgenLooks::Get(GetGUID().GetCounter());
+        stmt->SetData(index++, own ? (*own)[0] : GetByteValue(PLAYER_BYTES, 0));
+        stmt->SetData(index++, own ? (*own)[1] : GetByteValue(PLAYER_BYTES, 1));
+        stmt->SetData(index++, own ? (*own)[2] : GetByteValue(PLAYER_BYTES, 2));
+        stmt->SetData(index++, own ? (*own)[3] : GetByteValue(PLAYER_BYTES, 3));
+        stmt->SetData(index++, own ? (*own)[4] : GetByteValue(PLAYER_BYTES_2, 0));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 2));
         stmt->SetData(index++, GetByteValue(PLAYER_BYTES_2, 3));
         stmt->SetData(index++, GetPlayerFlags());
