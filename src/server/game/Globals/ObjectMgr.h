@@ -685,6 +685,8 @@ enum SkillRangeType
 SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 
 #define MAX_PLAYER_NAME          12                         // max allowed by client name length
+#define MAX_PLAYER_SURNAME       16                         // Ryker's Realm: second part of "First Last"
+#define MAX_PLAYER_FULL_NAME     (MAX_PLAYER_NAME + 1 + MAX_PLAYER_SURNAME + 1) // + one ' or -
 #define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length (> MAX_PLAYER_NAME for support declined names)
 #define MAX_PET_NAME             12                         // max allowed by client name length
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
@@ -1425,6 +1427,7 @@ public:
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
+    static uint8 CheckPlayerNamePart(std::string_view name, bool create, std::size_t maxLength);
     static PetNameInvalidReason CheckPetName(std::string_view name);
     static bool IsValidCharterName(std::string_view name);
     static bool IsValidChannelName(std::string const& name);

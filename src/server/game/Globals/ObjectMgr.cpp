@@ -206,25 +206,41 @@ std::string ScriptInfo::GetDebugInfo() const
     return std::string(sz);
 }
 
+// One name part: lower case, the first letter and a letter after ' or - upper case ("mac'tavish" -> "Mac'Tavish").
+static bool normalizeNamePart(std::string& part)
+{
+    std::wstring tmp;
+    if (part.empty() || !Utf8toWStr(part, tmp))
+        return false;
+
+    wstrToLower(tmp);
+    tmp[0] = wcharToUpper(tmp[0]);
+    for (std::size_t i = 1; i < tmp.size(); ++i)
+        if (tmp[i - 1] == L'\'' || tmp[i - 1] == L'-')
+            tmp[i] = wcharToUpper(tmp[i]);
+
+    return WStrToUtf8(tmp, part);
+}
+
+// Ryker's Realm (2026-10-13): a character name may be two parts, "First Last", with exactly one space between them
+// (Forever-style: the full name is the name). Anything else with a space is not a name.
 bool normalizePlayerName(std::string& name)
 {
     if (name.empty())
         return false;
 
-    if (name.find(" ") != std::string::npos)
+    std::size_t space = name.find(' ');
+    if (space == std::string::npos)
+        return normalizeNamePart(name);
+
+    if (space == 0 || space + 1 >= name.size() || name.find(' ', space + 1) != std::string::npos)
         return false;
 
-    std::wstring tmp;
-    if (!Utf8toWStr(name, tmp))
+    std::string first = name.substr(0, space), last = name.substr(space + 1);
+    if (!normalizeNamePart(first) || !normalizeNamePart(last))
         return false;
 
-    wstrToLower(tmp);
-    if (!tmp.empty())
-        tmp[0] = wcharToUpper(tmp[0]);
-
-    if (!WStrToUtf8(tmp, name))
-        return false;
-
+    name = first + " " + last;
     return true;
 }
 
@@ -9277,7 +9293,45 @@ bool isValidString(std::wstring wstr, uint32 strictMask, bool numericOrSpace, bo
     return false;
 }
 
+// Ryker's Realm (2026-10-13): "First", or "First Last". The first part follows the stock rules; the last part (the
+// surname) may be up to MAX_PLAYER_SURNAME letters with at most one ' or - between letters.
 uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
+{
+    std::size_t space = name.find(' ');
+    if (space == std::string_view::npos)
+        return CheckPlayerNamePart(name, create, MAX_PLAYER_NAME);
+
+    if (space == 0 || space + 1 >= name.size())
+        return CHAR_NAME_INVALID_SPACE;
+    if (name[space + 1] == ' ')
+        return CHAR_NAME_CONSECUTIVE_SPACES;
+    if (name.find(' ', space + 1) != std::string_view::npos)
+        return CHAR_NAME_INVALID_SPACE;
+
+    if (uint8 res = CheckPlayerNamePart(name.substr(0, space), create, MAX_PLAYER_NAME); res != CHAR_NAME_SUCCESS)
+        return res;
+
+    // the surname: one ' or - between letters, then checked as letters only
+    std::string_view last = name.substr(space + 1);
+    std::size_t marks = 0, markAt = 0;
+    for (std::size_t i = 0; i < last.size(); ++i)
+        if (last[i] == '\'' || last[i] == '-')
+        {
+            ++marks;
+            markAt = i;
+        }
+    if (marks > 1)
+        return CHAR_NAME_MULTIPLE_APOSTROPHES;
+    if (marks == 1 && (markAt == 0 || markAt + 1 == last.size()))
+        return CHAR_NAME_INVALID_APOSTROPHE;
+
+    std::string letters(last);
+    if (marks)
+        letters.erase(markAt, 1);
+    return CheckPlayerNamePart(letters, create, MAX_PLAYER_SURNAME);
+}
+
+uint8 ObjectMgr::CheckPlayerNamePart(std::string_view name, bool create, std::size_t maxLength)
 {
     std::wstring wname;
 
@@ -9286,7 +9340,7 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
         return CHAR_NAME_INVALID_CHARACTER;
 
     // Check for too long name
-    if (wname.size() > MAX_PLAYER_NAME)
+    if (wname.size() > maxLength)
         return CHAR_NAME_TOO_LONG;
 
     // Check for too short name

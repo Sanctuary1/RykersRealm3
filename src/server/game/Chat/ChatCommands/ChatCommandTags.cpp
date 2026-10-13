@@ -89,6 +89,28 @@ ChatCommandResult Acore::ChatCommands::AccountIdentifier::TryConsume(ChatHandler
 
 ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler const* handler, std::string_view args)
 {
+    // Ryker's Realm (2026-10-13): two-part names. "First Last" spans two command words; when the next two words are
+    // an existing character's name, they are that character. Otherwise the stock one-word parsing below applies.
+    if (TokenizeResult first = tokenize(args); first && !first.tail.empty() && first.token[0] != '|')
+    {
+        if (TokenizeResult second = tokenize(first.tail); second && second.token[0] != '|')
+        {
+            std::string full = std::string(first.token) + " " + std::string(second.token);
+            if (normalizePlayerName(full))
+            {
+                Player* player = ObjectAccessor::FindPlayerByName(full);
+                ObjectGuid guid = player ? player->GetGUID() : sCharacterCache->GetCharacterGuidByName(full);
+                if (guid)
+                {
+                    _name = full;
+                    _guid = guid;
+                    _player = player;
+                    return second.tail;
+                }
+            }
+        }
+    }
+
     Variant<Hyperlink<player>, ObjectGuid::LowType, std::string_view> val;
     ChatCommandResult next = ArgInfo<decltype(val)>::TryConsume(val, handler, args);
     if (!next)
